@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Wedding Earthy Palette */
+  --cream: #FAF6EF;
+  --terracotta: #C1714F;
+  --sage: #7D9B76;
+  --brown: #5C3D2E;
+  --warm-white: #FFFDF9;
+  
+  /* Semantic tokens mapped to wedding palette */
+  --background: #FAF6EF;
+  --foreground: #5C3D2E;
+  --card: #FFFDF9;
+  --card-foreground: #5C3D2E;
+  --popover: #FFFDF9;
+  --popover-foreground: #5C3D2E;
+  --primary: #C1714F;
+  --primary-foreground: #FFFDF9;
+  --secondary: #7D9B76;
+  --secondary-foreground: #FFFDF9;
+  --muted: #FAF6EF;
+  --muted-foreground: #8B6B5D;
+  --accent: #7D9B76;
+  --accent-foreground: #FFFDF9;
+  --destructive: #B84C3C;
+  --destructive-foreground: #FFFDF9;
+  --border: #E8DDD4;
+  --input: #E8DDD4;
+  --ring: #C1714F;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --font-sans: 'Lato', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --color-cream: var(--cream);
+  --color-terracotta: var(--terracotta);
+  --color-sage: var(--sage);
+  --color-brown: var(--brown);
+  --color-warm-white: var(--warm-white);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar for rustic feel */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--terracotta);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brown);
+}
