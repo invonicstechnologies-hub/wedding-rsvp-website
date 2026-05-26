@@ -1,28 +1,29 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { Countdown } from '@/components/countdown'
 import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
 import { LeafDecoration } from '@/components/leaf-decoration'
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0 }
-}
+export default function HomePage() {
+  const prefersReducedMotion = useReducedMotion()
+  
+  const fadeInUp = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    visible: { opacity: 1, y: 0 }
+  }
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: prefersReducedMotion ? 0 : 0.2,
+        delayChildren: prefersReducedMotion ? 0 : 0.1
+      }
     }
   }
-}
-
-export default function HomePage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero Section - Full Screen */}
@@ -298,19 +299,6 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-10 bg-brown text-warm-white/80 text-center">
-        <div className="flex items-center justify-center gap-3 mb-3">
-          <HandSignIcon className="w-5 h-5" />
-          <span className="font-serif text-xl tracking-wide">M & A</span>
-          <HandSignIcon className="w-5 h-5" />
-        </div>
-        <p className="text-sm">September 21, 2026 &bull; Nashville, Tennessee</p>
-        <p className="text-xs mt-2 text-warm-white/50">
-          Speaking love in words and signs
-        </p>
-      </footer>
     </div>
   )
 }

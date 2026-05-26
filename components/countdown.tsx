@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface TimeLeft {
   days: number
@@ -17,6 +17,7 @@ interface CountdownProps {
 export function Countdown({ targetDate }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const [mounted, setMounted] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)
@@ -55,9 +56,9 @@ export function Countdown({ targetDate }: CountdownProps) {
       {timeUnits.map((unit, index) => (
         <motion.div
           key={unit.label}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
+          transition={{ delay: prefersReducedMotion ? 0 : index * 0.1 }}
           className="text-center"
         >
           <div className="bg-warm-white rounded-lg shadow-lg p-3 md:p-5 min-w-[70px] md:min-w-[90px] border border-border">

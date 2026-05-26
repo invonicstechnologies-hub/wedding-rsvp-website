@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { 
   Users, 
   CheckCircle, 
@@ -30,6 +30,8 @@ type SortField = 'name' | 'phone' | 'attending' | 'guestCount' | 'createdAt'
 type SortDirection = 'asc' | 'desc'
 
 export default function AdminPage() {
+  const prefersReducedMotion = useReducedMotion()
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')

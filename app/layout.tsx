@@ -3,6 +3,7 @@ import { Playfair_Display, Lato } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { Navigation } from '@/components/navigation'
+import { Footer } from '@/components/footer'
 
 const playfair = Playfair_Display({ 
   subsets: ["latin"],
@@ -46,11 +47,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${lato.variable} bg-cream`}>
-      <body className="font-sans antialiased min-h-screen">
+      <body className="font-sans antialiased min-h-screen flex flex-col">
+        {/* Grain texture overlay for rustic paper feel */}
+        <div className="grain-overlay" aria-hidden="true" />
         <Navigation />
-        <main>
+        <main className="flex-1">
           {children}
         </main>
+        <Footer />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

@@ -1,35 +1,36 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { MapPin, Clock, Calendar, HelpCircle, Church, PartyPopper } from 'lucide-react'
 import { HandSignIcon } from '@/components/hand-sign-icon'
 import { SimpleLeaf } from '@/components/leaf-decoration'
 import Link from 'next/link'
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-50px' },
-  transition: { duration: 0.6, ease: 'easeOut' }
-}
-
-const staggerContainer = {
-  initial: {},
-  whileInView: {
-    transition: {
-      staggerChildren: 0.15
-    }
-  },
-  viewport: { once: true }
-}
-
-const staggerItem = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
-}
-
 export default function DetailsPage() {
+  const prefersReducedMotion = useReducedMotion()
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: '-50px' },
+    transition: { duration: prefersReducedMotion ? 0 : 0.6, ease: 'easeOut' }
+  }
+
+  const staggerContainer = {
+    initial: {},
+    whileInView: {
+      transition: {
+        staggerChildren: prefersReducedMotion ? 0 : 0.15
+      }
+    },
+    viewport: { once: true }
+  }
+
+  const staggerItem = {
+    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    whileInView: { opacity: 1, y: 0 },
+    transition: { duration: prefersReducedMotion ? 0 : 0.5 }
+  }
   const faqs = [
     {
       question: 'Where should I park?',
@@ -292,16 +293,6 @@ export default function DetailsPage() {
           </Link>
         </motion.div>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-24 py-8 bg-brown text-warm-white/80 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <HandSignIcon className="w-5 h-5" />
-          <span className="font-serif text-lg">Manu & Anne</span>
-          <HandSignIcon className="w-5 h-5" />
-        </div>
-        <p className="text-sm">September 21, 2026 • Nashville, TN</p>
-      </footer>
     </div>
   )
 }

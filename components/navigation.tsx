@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { HandSignIcon } from './hand-sign-icon'
@@ -16,15 +16,16 @@ const navItems = [
 export function Navigation() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   // Don't show navigation on admin page
   if (pathname === '/admin') return null
 
   return (
     <motion.nav 
-      initial={{ y: -100 }}
+      initial={prefersReducedMotion ? { y: 0 } : { y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.6, ease: 'easeOut' }}
       className="fixed top-0 left-0 right-0 z-50 bg-warm-white/90 backdrop-blur-sm border-b border-border"
     >
       <div className="max-w-6xl mx-auto px-6 py-4">

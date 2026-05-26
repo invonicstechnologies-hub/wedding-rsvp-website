@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { HandSignIcon } from '@/components/hand-sign-icon'
 import { SimpleLeaf } from '@/components/leaf-decoration'
 import { Check, Loader2, AlertCircle } from 'lucide-react'
@@ -9,6 +9,8 @@ import { Check, Loader2, AlertCircle } from 'lucide-react'
 type FormState = 'idle' | 'loading' | 'success' | 'error'
 
 export default function RSVPPage() {
+  const prefersReducedMotion = useReducedMotion()
+  
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -55,19 +57,19 @@ export default function RSVPPage() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
+        staggerChildren: prefersReducedMotion ? 0 : 0.1,
       },
     },
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
     visible: { opacity: 1, y: 0 },
   }
 
   const inputFocusVariants = {
     rest: { scale: 1 },
-    focus: { scale: 1.01, transition: { duration: 0.2 } },
+    focus: { scale: prefersReducedMotion ? 1 : 1.01, transition: { duration: 0.2 } },
   }
 
   // Success state
