@@ -1,51 +1,127 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { HandSignIcon } from '@/components/hand-sign-icon'
 import { SimpleLeaf } from '@/components/leaf-decoration'
-import { Check } from 'lucide-react'
+import { Check, Loader2, AlertCircle } from 'lucide-react'
+
+type FormState = 'idle' | 'loading' | 'success' | 'error'
 
 export default function RSVPPage() {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    attending: '',
-    guests: '1',
-    mealPreference: '',
-    dietaryRestrictions: '',
-    signLanguageInterpreter: false,
+    phone: '',
     message: '',
+    attending: true,
+    guestCount: 1,
   })
-  const [submitted, setSubmitted] = useState(false)
+  const [formState, setFormState] = useState<FormState>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, this would submit to a database
-    console.log('RSVP submitted:', formData)
-    setSubmitted(true)
+    setFormState('loading')
+    setErrorMessage('')
+
+    try {
+      const response = await fetch('http://localhost:5678/webhook/rsvp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.message,
+          attending: formData.attending,
+          guestCount: formData.attending ? formData.guestCount : 0,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to submit RSVP')
+      }
+
+      setFormState('success')
+    } catch {
+      setFormState('error')
+      setErrorMessage('Something went wrong. Please try again or contact the couple directly.')
+    }
   }
 
-  if (submitted) {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  }
+
+  const inputFocusVariants = {
+    rest: { scale: 1 },
+    focus: { scale: 1.01, transition: { duration: 0.2 } },
+  }
+
+  // Success state
+  if (formState === 'success') {
     return (
       <div className="min-h-screen bg-cream pt-24 pb-16">
         <div className="max-w-2xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', duration: 0.6 }}
             className="bg-warm-white rounded-lg shadow-lg p-8 md:p-12 text-center"
           >
-            <div className="w-16 h-16 bg-sage/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-8 h-8 text-sage" />
-            </div>
-            <h2 className="font-serif text-3xl text-brown mb-4">Thank You!</h2>
-            <p className="text-muted-foreground mb-2">
-              Your RSVP has been received. We&apos;re so grateful you&apos;ll be joining us!
-            </p>
-            <p className="text-sm text-muted-foreground italic mt-6">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              className="w-20 h-20 bg-sage/20 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <Check className="w-10 h-10 text-sage" />
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="font-serif text-3xl md:text-4xl text-brown mb-4"
+            >
+              {formData.attending ? 'We Can\'t Wait to See You!' : 'Thank You for Letting Us Know'}
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-muted-foreground mb-2 text-lg"
+            >
+              {formData.attending
+                ? 'Your RSVP has been received. We\'re so grateful you\'ll be joining us on our special day!'
+                : 'We\'ll miss you, but we\'re thankful for your warm wishes. You\'ll be in our hearts.'}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-sm text-muted-foreground italic mt-6"
+            >
               &ldquo;Every good and perfect gift is from above&rdquo; — James 1:17
-            </p>
-            <HandSignIcon className="w-8 h-8 text-terracotta/50 mx-auto mt-6" />
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <HandSignIcon className="w-10 h-10 text-terracotta/50 mx-auto mt-6" />
+            </motion.div>
           </motion.div>
         </div>
       </div>
@@ -79,197 +155,185 @@ export default function RSVPPage() {
 
         {/* Form */}
         <motion.form
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           onSubmit={handleSubmit}
           className="bg-warm-white rounded-lg shadow-lg p-6 md:p-8 space-y-6"
         >
+          {/* Error Banner */}
+          <AnimatePresence>
+            {formState === 'error' && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-destructive/10 border border-destructive/30 rounded-md p-4 flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-destructive">Unable to submit RSVP</p>
+                  <p className="text-sm text-destructive/80">{errorMessage}</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Name */}
-          <div>
+          <motion.div variants={itemVariants}>
             <label htmlFor="name" className="block text-sm font-medium text-brown mb-2">
-              Full Name *
+              Full Name <span className="text-terracotta">*</span>
             </label>
-            <input
+            <motion.input
+              variants={inputFocusVariants}
+              initial="rest"
+              whileFocus="focus"
               type="text"
               id="name"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-colors"
+              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200"
               placeholder="Your full name"
             />
-          </div>
+          </motion.div>
 
-          {/* Email */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-brown mb-2">
-              Email Address *
+          {/* Phone */}
+          <motion.div variants={itemVariants}>
+            <label htmlFor="phone" className="block text-sm font-medium text-brown mb-2">
+              Phone Number <span className="text-terracotta">*</span>
             </label>
-            <input
-              type="email"
-              id="email"
+            <motion.input
+              variants={inputFocusVariants}
+              initial="rest"
+              whileFocus="focus"
+              type="tel"
+              id="phone"
               required
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-colors"
-              placeholder="your@email.com"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200"
+              placeholder="(555) 123-4567"
             />
-          </div>
+          </motion.div>
 
-          {/* Attending */}
-          <div>
+          {/* Attending Toggle */}
+          <motion.div variants={itemVariants}>
             <label className="block text-sm font-medium text-brown mb-3">
-              Will you be attending? *
+              Will you be attending? <span className="text-terracotta">*</span>
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
-              {[
-                { value: 'yes', label: 'Joyfully Accept' },
-                { value: 'no', label: 'Regretfully Decline' },
-              ].map((option) => (
-                <label
-                  key={option.value}
-                  className={`flex-1 flex items-center justify-center px-4 py-3 border-2 rounded-md cursor-pointer transition-all ${
-                    formData.attending === option.value
-                      ? 'border-terracotta bg-terracotta/10 text-terracotta'
-                      : 'border-border hover:border-terracotta/50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="attending"
-                    value={option.value}
-                    checked={formData.attending === option.value}
-                    onChange={(e) => setFormData({ ...formData, attending: e.target.value })}
-                    className="sr-only"
-                    required
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
+              <motion.label
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`flex-1 flex items-center justify-center px-4 py-4 border-2 rounded-md cursor-pointer transition-all ${
+                  formData.attending
+                    ? 'border-terracotta bg-terracotta/10 text-terracotta'
+                    : 'border-border hover:border-terracotta/50 text-muted-foreground'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="attending"
+                  checked={formData.attending}
+                  onChange={() => setFormData({ ...formData, attending: true })}
+                  className="sr-only"
+                />
+                <span className="font-medium">Joyfully Accept</span>
+              </motion.label>
+              <motion.label
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`flex-1 flex items-center justify-center px-4 py-4 border-2 rounded-md cursor-pointer transition-all ${
+                  !formData.attending
+                    ? 'border-terracotta bg-terracotta/10 text-terracotta'
+                    : 'border-border hover:border-terracotta/50 text-muted-foreground'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="attending"
+                  checked={!formData.attending}
+                  onChange={() => setFormData({ ...formData, attending: false })}
+                  className="sr-only"
+                />
+                <span className="font-medium">Regretfully Decline</span>
+              </motion.label>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Conditional fields when attending */}
-          {formData.attending === 'yes' && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="space-y-6"
-            >
-              {/* Number of Guests */}
-              <div>
-                <label htmlFor="guests" className="block text-sm font-medium text-brown mb-2">
+          {/* Guest Count - Only shown when attending */}
+          <AnimatePresence>
+            {formData.attending && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <label htmlFor="guestCount" className="block text-sm font-medium text-brown mb-2">
                   Number of Guests (including yourself)
                 </label>
-                <select
-                  id="guests"
-                  value={formData.guests}
-                  onChange={(e) => setFormData({ ...formData, guests: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-colors"
-                >
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <option key={num} value={num}>{num}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Meal Preference */}
-              <div>
-                <label className="block text-sm font-medium text-brown mb-3">
-                  Meal Preference
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {['Chicken', 'Fish', 'Vegetarian'].map((meal) => (
-                    <label
-                      key={meal}
-                      className={`flex items-center justify-center px-4 py-3 border-2 rounded-md cursor-pointer transition-all ${
-                        formData.mealPreference === meal
-                          ? 'border-sage bg-sage/10 text-sage'
-                          : 'border-border hover:border-sage/50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="meal"
-                        value={meal}
-                        checked={formData.mealPreference === meal}
-                        onChange={(e) => setFormData({ ...formData, mealPreference: e.target.value })}
-                        className="sr-only"
-                      />
-                      <span>{meal}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Dietary Restrictions */}
-              <div>
-                <label htmlFor="dietary" className="block text-sm font-medium text-brown mb-2">
-                  Dietary Restrictions or Allergies
-                </label>
-                <input
-                  type="text"
-                  id="dietary"
-                  value={formData.dietaryRestrictions}
-                  onChange={(e) => setFormData({ ...formData, dietaryRestrictions: e.target.value })}
-                  className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-colors"
-                  placeholder="Please list any allergies or restrictions"
+                <motion.input
+                  variants={inputFocusVariants}
+                  initial="rest"
+                  whileFocus="focus"
+                  type="number"
+                  id="guestCount"
+                  min={1}
+                  max={10}
+                  value={formData.guestCount}
+                  onChange={(e) => setFormData({ ...formData, guestCount: parseInt(e.target.value) || 1 })}
+                  className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200"
                 />
-              </div>
-
-              {/* Sign Language Interpreter */}
-              <div className="bg-sage/10 rounded-md p-4 border border-sage/20">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.signLanguageInterpreter}
-                    onChange={(e) => setFormData({ ...formData, signLanguageInterpreter: e.target.checked })}
-                    className="mt-1 w-5 h-5 text-terracotta border-border rounded focus:ring-terracotta"
-                  />
-                  <div>
-                    <span className="font-medium text-brown flex items-center gap-2">
-                      <HandSignIcon className="w-5 h-5 text-sage" />
-                      Sign Language Interpretation
-                    </span>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Our ceremony will include sign language interpretation. Check this box if you&apos;d prefer seating with a clear view of the interpreter.
-                    </p>
-                  </div>
-                </label>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Message */}
-          <div>
+          <motion.div variants={itemVariants}>
             <label htmlFor="message" className="block text-sm font-medium text-brown mb-2">
-              Message for the Couple (Optional)
+              Message / Note to the Couple
             </label>
-            <textarea
+            <motion.textarea
+              variants={inputFocusVariants}
+              initial="rest"
+              whileFocus="focus"
               id="message"
               rows={4}
               value={formData.message}
               onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-colors resize-none"
-              placeholder="Share your well wishes..."
+              className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200 resize-none"
+              placeholder="Share your well wishes or a special note..."
             />
-          </div>
+          </motion.div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-terracotta text-warm-white font-medium rounded-md hover:bg-terracotta/90 transition-colors shadow-lg shadow-terracotta/20"
-          >
-            Submit RSVP
-          </button>
+          {/* Submit Button */}
+          <motion.div variants={itemVariants}>
+            <motion.button
+              type="submit"
+              disabled={formState === 'loading'}
+              whileHover={{ scale: formState === 'loading' ? 1 : 1.02 }}
+              whileTap={{ scale: formState === 'loading' ? 1 : 0.98 }}
+              className="w-full py-4 bg-terracotta text-warm-white font-medium rounded-md hover:bg-terracotta/90 transition-colors shadow-lg shadow-terracotta/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {formState === 'loading' ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <span>Submit RSVP</span>
+              )}
+            </motion.button>
+          </motion.div>
         </motion.form>
 
         {/* Footer Quote */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.6 }}
           className="text-center text-sm text-muted-foreground mt-8 italic"
         >
           &ldquo;Let us not love with words or speech but with actions and in truth.&rdquo; — 1 John 3:18
