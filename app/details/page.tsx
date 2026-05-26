@@ -1,261 +1,292 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { MapPin, Clock, Calendar, Heart, Gift, Camera, Church } from 'lucide-react'
-import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
+import { MapPin, Clock, Calendar, HelpCircle, Church, PartyPopper } from 'lucide-react'
+import { HandSignIcon } from '@/components/hand-sign-icon'
 import { SimpleLeaf } from '@/components/leaf-decoration'
 import Link from 'next/link'
 
 const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-50px' },
+  transition: { duration: 0.6, ease: 'easeOut' }
+}
+
+const staggerContainer = {
+  initial: {},
+  whileInView: {
+    transition: {
+      staggerChildren: 0.15
+    }
+  },
+  viewport: { once: true }
+}
+
+const staggerItem = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  transition: { duration: 0.5 }
 }
 
 export default function DetailsPage() {
+  const faqs = [
+    {
+      question: 'Where should I park?',
+      answer: 'Free parking is available at both venues. The church has a large lot behind the building, and the reception barn has ample space in the front field. Signs will guide you.'
+    },
+    {
+      question: 'Are children welcome?',
+      answer: 'Absolutely! We love little ones. A supervised kids corner with activities will be available at the reception for ages 3-10.'
+    },
+    {
+      question: 'What about gifts?',
+      answer: 'Your presence is truly the greatest gift. If you wish to give, we have a small registry or you may contribute to our mission fund supporting deaf ministry in Zambia.'
+    },
+    {
+      question: 'Will there be sign language interpretation?',
+      answer: 'Yes! The ceremony and key reception moments will have ASL interpretation. Seating near the interpreter will be available — just let us know on your RSVP.'
+    },
+    {
+      question: 'Can I take photos during the ceremony?',
+      answer: 'We kindly ask for an unplugged ceremony — please silence devices and enjoy being present. You are welcome to take photos during the reception!'
+    },
+    {
+      question: 'Is the venue accessible?',
+      answer: 'Yes, both venues are wheelchair accessible. Please reach out if you have specific accessibility needs and we will accommodate you.'
+    }
+  ]
+
   return (
     <div className="min-h-screen bg-cream pt-24 pb-16">
       {/* Header */}
-      <section className="max-w-4xl mx-auto px-6 text-center mb-16">
-        <motion.div {...fadeInUp}>
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <SimpleLeaf className="w-6 h-6 text-sage/60 rotate-[-30deg]" />
-            <HandSignIcon className="w-8 h-8 text-terracotta/70" />
-            <SimpleLeaf className="w-6 h-6 text-sage/60 rotate-[30deg] scale-x-[-1]" />
-          </div>
-          <h1 className="font-serif text-4xl md:text-5xl text-brown mb-4">
-            Wedding Details
-          </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            All the information you need for our special day — where hearts speak in every language
-          </p>
-        </motion.div>
-      </section>
+      <motion.section 
+        className="max-w-4xl mx-auto px-6 text-center mb-20"
+        {...fadeInUp}
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <SimpleLeaf className="w-6 h-6 text-sage/60 rotate-[-30deg]" />
+          <HandSignIcon className="w-8 h-8 text-terracotta/70" />
+          <SimpleLeaf className="w-6 h-6 text-sage/60 rotate-[30deg] scale-x-[-1]" />
+        </div>
+        <h1 className="font-serif text-4xl md:text-5xl text-brown mb-4">
+          Wedding Details
+        </h1>
+        <p className="text-brown/70 max-w-lg mx-auto leading-relaxed">
+          Everything you need to know about our celebration of love and faith
+        </p>
+      </motion.section>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 space-y-8">
-        {/* Ceremony & Reception */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Ceremony */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-warm-white rounded-lg shadow-lg p-6 md:p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-terracotta/10 rounded-full flex items-center justify-center">
-                <Church className="w-5 h-5 text-terracotta" />
-              </div>
-              <h2 className="font-serif text-2xl text-brown">Ceremony</h2>
+      <div className="max-w-4xl mx-auto px-6 space-y-20">
+        {/* Ceremony Section */}
+        <motion.section
+          {...fadeInUp}
+          className="bg-warm-white rounded-2xl shadow-lg p-8 md:p-10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-terracotta/10 rounded-full flex items-center justify-center">
+              <Church className="w-6 h-6 text-terracotta" />
             </div>
-            <div className="space-y-3 text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-sage mt-0.5 shrink-0" />
+            <h2 className="font-serif text-3xl text-brown">The Ceremony</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <Calendar className="w-5 h-5 text-sage mt-1 shrink-0" />
                 <div>
-                  <p className="font-medium text-brown">Monday, September 21, 2026</p>
+                  <p className="font-medium text-brown">Saturday, September 21, 2026</p>
+                  <p className="text-sm text-brown/60">Save the date!</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-sage mt-0.5 shrink-0" />
+              <div className="flex items-start gap-4">
+                <Clock className="w-5 h-5 text-sage mt-1 shrink-0" />
                 <div>
                   <p className="font-medium text-brown">2:00 PM</p>
-                  <p className="text-sm">Please arrive 15 minutes early</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-sage mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-medium text-brown">Grace Community Church</p>
-                  <p className="text-sm">1234 Faith Avenue</p>
-                  <p className="text-sm">Nashville, TN 37203</p>
+                  <p className="text-sm text-brown/60">Please arrive by 1:45 PM</p>
                 </div>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-border">
-              <div className="flex items-center gap-2 text-sm text-sage">
-                <HandSignIcon className="w-4 h-4" />
-                <span>Sign language interpretation provided</span>
+            
+            <div className="flex items-start gap-4">
+              <MapPin className="w-5 h-5 text-sage mt-1 shrink-0" />
+              <div>
+                <p className="font-medium text-brown">Grace Community Church</p>
+                <p className="text-brown/70">1234 Faith Avenue</p>
+                <p className="text-brown/70">Nashville, TN 37203</p>
+                <a 
+                  href="https://maps.google.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm text-terracotta hover:underline"
+                >
+                  View on Map
+                </a>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Reception */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-warm-white rounded-lg shadow-lg p-6 md:p-8"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-sage/10 rounded-full flex items-center justify-center">
-                <Heart className="w-5 h-5 text-sage" />
-              </div>
-              <h2 className="font-serif text-2xl text-brown">Reception</h2>
+          <div className="mt-6 pt-6 border-t border-brown/10">
+            <div className="flex items-center gap-2 text-sm text-sage">
+              <HandSignIcon className="w-4 h-4" />
+              <span>ASL interpretation will be provided throughout the ceremony</span>
             </div>
-            <div className="space-y-3 text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-terracotta mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-medium text-brown">Same Day</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 text-terracotta mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-medium text-brown">4:00 PM - 10:00 PM</p>
-                  <p className="text-sm">Cocktail hour begins at 4:00 PM</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-terracotta mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-medium text-brown">Rustic Barn at Meadow Creek</p>
-                  <p className="text-sm">5678 Country Road</p>
-                  <p className="text-sm">Nashville, TN 37215</p>
-                </div>
-              </div>
+          </div>
+        </motion.section>
+
+        {/* Reception Section */}
+        <motion.section
+          {...fadeInUp}
+          className="bg-warm-white rounded-2xl shadow-lg p-8 md:p-10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 bg-sage/10 rounded-full flex items-center justify-center">
+              <PartyPopper className="w-6 h-6 text-sage" />
             </div>
-            <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-sm text-muted-foreground italic">
-                Dinner, dancing, and fellowship to follow
+            <h2 className="font-serif text-3xl text-brown">The Reception</h2>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <Clock className="w-5 h-5 text-terracotta mt-1 shrink-0" />
+                <div>
+                  <p className="font-medium text-brown">4:00 PM — 10:00 PM</p>
+                  <p className="text-sm text-brown/60">Cocktails, dinner, dancing & fellowship</p>
+                </div>
+              </div>
+              <p className="text-brown/70 text-sm pl-9">
+                Join us immediately following the ceremony for an evening of celebration, 
+                delicious food, and joyful fellowship as we begin this new chapter.
               </p>
             </div>
-          </motion.div>
-        </div>
-
-        {/* Schedule */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-warm-white rounded-lg shadow-lg p-6 md:p-8"
-        >
-          <h2 className="font-serif text-2xl text-brown mb-6 text-center">Schedule of Events</h2>
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-[22px] top-2 bottom-2 w-0.5 bg-border md:left-1/2 md:-translate-x-0.5" />
             
-            {[
-              { time: '1:45 PM', event: 'Guest Arrival', description: 'Seating begins at the church' },
-              { time: '2:00 PM', event: 'Ceremony', description: 'Union of Manu & Anne in Christ' },
-              { time: '3:00 PM', event: 'Photos', description: 'Family and wedding party photos' },
-              { time: '4:00 PM', event: 'Cocktail Hour', description: 'Appetizers and refreshments' },
-              { time: '5:30 PM', event: 'Dinner', description: 'Blessing and seated dinner' },
-              { time: '7:00 PM', event: 'First Dance & Toasts', description: 'Celebrating the couple' },
-              { time: '7:30 PM', event: 'Dancing & Fellowship', description: 'Join us on the dance floor' },
-              { time: '10:00 PM', event: 'Farewell', description: 'Send off the newlyweds' },
-            ].map((item, index) => (
-              <div key={index} className="relative flex items-start gap-4 pb-6 last:pb-0 md:justify-center">
-                <div className="w-11 h-11 rounded-full bg-cream border-2 border-terracotta flex items-center justify-center z-10 shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2">
-                  <span className="text-xs font-medium text-terracotta">{index + 1}</span>
-                </div>
-                <div className={`flex-1 md:w-[calc(50%-40px)] ${index % 2 === 0 ? 'md:pr-12 md:text-right md:mr-auto md:ml-0' : 'md:pl-12 md:ml-auto md:mr-0'}`}>
-                  <p className="font-medium text-terracotta">{item.time}</p>
-                  <p className="font-serif text-lg text-brown">{item.event}</p>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                </div>
+            <div className="flex items-start gap-4">
+              <MapPin className="w-5 h-5 text-terracotta mt-1 shrink-0" />
+              <div>
+                <p className="font-medium text-brown">Rustic Barn at Meadow Creek</p>
+                <p className="text-brown/70">5678 Country Road</p>
+                <p className="text-brown/70">Nashville, TN 37215</p>
+                <a 
+                  href="https://maps.google.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm text-terracotta hover:underline"
+                >
+                  View on Map
+                </a>
               </div>
+            </div>
+          </div>
+        </motion.section>
+
+        {/* Dress Code Section */}
+        <motion.section
+          {...fadeInUp}
+          className="bg-warm-white rounded-2xl shadow-lg p-8 md:p-10"
+        >
+          <h2 className="font-serif text-3xl text-brown mb-6 text-center">Dress Code</h2>
+          
+          <div className="text-center max-w-xl mx-auto">
+            <p className="text-xl text-brown font-medium mb-3">Rustic Smart Casual</p>
+            <p className="text-brown/70 leading-relaxed mb-6">
+              Think elegant yet comfortable — our celebration includes both an indoor ceremony 
+              and an outdoor barn reception. Ladies, you may want to consider wedge heels 
+              for grass and gravel areas.
+            </p>
+            
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 px-4 py-2 bg-cream rounded-full">
+                <div className="w-4 h-4 rounded-full bg-[#FAF6EF] border border-brown/20" />
+                <span className="text-sm text-brown">Cream</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-cream rounded-full">
+                <div className="w-4 h-4 rounded-full bg-[#C1714F]" />
+                <span className="text-sm text-brown">Terracotta</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-cream rounded-full">
+                <div className="w-4 h-4 rounded-full bg-[#7D9B76]" />
+                <span className="text-sm text-brown">Sage</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-cream rounded-full">
+                <div className="w-4 h-4 rounded-full bg-[#5C3D2E]" />
+                <span className="text-sm text-brown">Brown</span>
+              </div>
+            </div>
+            
+            <p className="text-sm text-sage mt-4 flex items-center justify-center gap-2">
+              <SimpleLeaf className="w-4 h-4" />
+              Earthy tones are encouraged but not required
+            </p>
+          </div>
+        </motion.section>
+
+        {/* Our Verse Section */}
+        <motion.section
+          {...fadeInUp}
+          className="relative overflow-hidden rounded-2xl bg-brown text-warm-white p-10 md:p-14"
+        >
+          {/* Decorative elements */}
+          <SimpleLeaf className="absolute top-6 left-6 w-10 h-10 text-warm-white/10 rotate-[-20deg]" />
+          <SimpleLeaf className="absolute bottom-6 right-6 w-10 h-10 text-warm-white/10 rotate-[160deg]" />
+          <HandSignIcon className="absolute top-6 right-6 w-8 h-8 text-warm-white/10" />
+          <HandSignIcon className="absolute bottom-6 left-6 w-8 h-8 text-warm-white/10" />
+          
+          <div className="relative text-center max-w-2xl mx-auto">
+            <p className="text-warm-white/60 text-sm uppercase tracking-widest mb-6">Our Verse</p>
+            <blockquote className="font-serif text-2xl md:text-3xl leading-relaxed mb-6">
+              &ldquo;Two are better than one, because they have a good return for their labor: 
+              If either of them falls down, one can help the other up.&rdquo;
+            </blockquote>
+            <cite className="text-warm-white/80 text-lg not-italic">
+              — Ecclesiastes 4:9-10
+            </cite>
+            <p className="mt-6 text-warm-white/60 text-sm max-w-md mx-auto">
+              This verse has guided our relationship from the very beginning — 
+              a reminder that God designed us to walk through life together.
+            </p>
+          </div>
+        </motion.section>
+
+        {/* FAQ Section */}
+        <motion.section
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={{ once: true, margin: '-50px' }}
+        >
+          <div className="text-center mb-10">
+            <div className="flex items-center justify-center gap-2 mb-3">
+              <HelpCircle className="w-6 h-6 text-terracotta" />
+              <h2 className="font-serif text-3xl text-brown">Frequently Asked Questions</h2>
+            </div>
+            <p className="text-brown/60">Got questions? We&apos;ve got answers.</p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                variants={staggerItem}
+                viewport={{ once: true }}
+                className="bg-warm-white rounded-xl p-6 shadow-sm"
+              >
+                <h3 className="font-medium text-brown mb-2">{faq.question}</h3>
+                <p className="text-brown/70 text-sm leading-relaxed">{faq.answer}</p>
+              </motion.div>
             ))}
           </div>
-        </motion.div>
-
-        {/* Additional Info */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Dress Code */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-warm-white rounded-lg shadow-lg p-6"
-          >
-            <h3 className="font-serif text-xl text-brown mb-3">Attire</h3>
-            <p className="text-muted-foreground mb-2">
-              <span className="font-medium text-brown">Garden Formal</span>
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Think elegant but comfortable — the reception includes an outdoor barn setting. Ladies, consider wedge heels for grass areas.
-            </p>
-            <div className="mt-3 flex items-center gap-2 text-sm text-sage">
-              <SimpleLeaf className="w-4 h-4" />
-              <span>Earthy tones encouraged</span>
-            </div>
-          </motion.div>
-
-          {/* Registry */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-warm-white rounded-lg shadow-lg p-6"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Gift className="w-5 h-5 text-terracotta" />
-              <h3 className="font-serif text-xl text-brown">Registry</h3>
-            </div>
-            <p className="text-muted-foreground text-sm mb-4">
-              Your presence is our greatest gift. For those who wish to bless us further, we&apos;ve registered at:
-            </p>
-            <div className="space-y-2">
-              <a href="#" className="block px-4 py-2 border border-border rounded-md text-center text-brown hover:border-terracotta transition-colors">
-                Zola Registry
-              </a>
-              <a href="#" className="block px-4 py-2 border border-border rounded-md text-center text-brown hover:border-terracotta transition-colors">
-                Amazon Wedding
-              </a>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3 italic text-center">
-              Contributions to our mission fund are also welcome
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Photo Sharing */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="bg-sage/10 rounded-lg p-6 border border-sage/20 text-center"
-        >
-          <Camera className="w-8 h-8 text-sage mx-auto mb-3" />
-          <h3 className="font-serif text-xl text-brown mb-2">Share Your Photos</h3>
-          <p className="text-muted-foreground text-sm mb-3">
-            We&apos;d love to see the day through your eyes! Share your photos using:
-          </p>
-          <p className="font-medium text-terracotta text-lg">#ManuAndAnne2026</p>
-          <p className="text-xs text-muted-foreground mt-2">
-            Unplugged ceremony — please silence devices during the service
-          </p>
-        </motion.div>
-
-        {/* Our Story Teaser */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="bg-warm-white rounded-lg shadow-lg p-6 md:p-8 text-center"
-        >
-          <HeartHandsIcon className="w-10 h-10 text-terracotta/60 mx-auto mb-4" />
-          <h3 className="font-serif text-2xl text-brown mb-3">Our Story</h3>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            From mission fields to spoken words and signed promises, God has woven our stories together in the most beautiful way. We met serving at a deaf ministry outreach and discovered that love truly speaks in every language.
-          </p>
-          <p className="text-sm text-sage mt-4 italic">
-            &ldquo;For where two or three gather in my name, there am I with them.&rdquo; — Matthew 18:20
-          </p>
-        </motion.div>
+        </motion.section>
 
         {/* CTA */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
+          {...fadeInUp}
           className="text-center pt-8"
         >
-          <p className="text-muted-foreground mb-4">Ready to join us?</p>
+          <p className="text-brown/70 mb-4">We can&apos;t wait to celebrate with you!</p>
           <Link
             href="/rsvp"
-            className="inline-block px-8 py-3 bg-terracotta text-warm-white font-medium rounded-md hover:bg-terracotta/90 transition-colors shadow-lg shadow-terracotta/20"
+            className="inline-block px-8 py-3 bg-terracotta text-warm-white font-medium rounded-lg hover:bg-terracotta/90 transition-colors shadow-lg shadow-terracotta/20"
           >
             RSVP Now
           </Link>
@@ -263,10 +294,10 @@ export default function DetailsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-20 py-8 bg-brown text-warm-white/80 text-center">
+      <footer className="mt-24 py-8 bg-brown text-warm-white/80 text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           <HandSignIcon className="w-5 h-5" />
-          <span className="font-serif text-lg">M & A</span>
+          <span className="font-serif text-lg">Manu & Anne</span>
           <HandSignIcon className="w-5 h-5" />
         </div>
         <p className="text-sm">September 21, 2026 • Nashville, TN</p>
