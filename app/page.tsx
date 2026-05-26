@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Countdown } from '@/components/countdown'
 import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
 import { LeafDecoration } from '@/components/leaf-decoration'
+import { FallingPetals, CornerWreath, ScrollBloomDivider } from '@/components/florals'
 
 export default function HomePage() {
   const prefersReducedMotion = useReducedMotion()
@@ -26,8 +27,15 @@ export default function HomePage() {
   }
   return (
     <div className="min-h-screen bg-cream">
+      {/* Falling Petals Animation */}
+      <FallingPetals count={24} />
+      
       {/* Hero Section - Full Screen */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Corner floral wreaths */}
+        <CornerWreath corner="top-left" size={100} className="z-20" />
+        <CornerWreath corner="bottom-right" size={100} className="z-20" />
+        
         {/* Decorative elements */}
         <LeafDecoration className="absolute top-0 left-0 w-40 md:w-56 text-sage/30" position="left" />
         <LeafDecoration className="absolute top-0 right-0 w-40 md:w-56 text-sage/30" position="right" />

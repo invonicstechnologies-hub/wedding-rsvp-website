@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
+import { FloatingBotanicalsBackground } from '@/components/florals'
 
 const playfair = Playfair_Display({ 
   subsets: ["latin"],
@@ -50,6 +51,8 @@ export default function RootLayout({
       <body className="font-sans antialiased min-h-screen flex flex-col">
         {/* Grain texture overlay for rustic paper feel */}
         <div className="grain-overlay" aria-hidden="true" />
+        {/* Floating botanical background decorations */}
+        <FloatingBotanicalsBackground />
         <Navigation />
         <main className="flex-1">
           {children}
