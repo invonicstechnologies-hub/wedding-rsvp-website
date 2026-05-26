@@ -1,65 +1,257 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Users, 
   CheckCircle, 
   XCircle, 
-  Clock, 
+  UserPlus,
   Search,
-  Download,
-  Filter,
-  HandMetal,
-  Utensils,
-  Mail
+  ChevronUp,
+  ChevronDown,
+  Lock,
+  AlertCircle,
+  Loader2
 } from 'lucide-react'
 import { HandSignIcon } from '@/components/hand-sign-icon'
 
-// Mock RSVP data - in a real app, this would come from a database
-const mockRSVPs = [
-  { id: 1, name: 'Sarah Johnson', email: 'sarah@email.com', attending: 'yes', guests: 2, meal: 'Chicken', signInterpreter: true, submittedAt: '2026-06-15', message: 'So excited for you both!' },
-  { id: 2, name: 'Michael Chen', email: 'mchen@email.com', attending: 'yes', guests: 1, meal: 'Vegetarian', signInterpreter: false, submittedAt: '2026-06-14', message: '' },
-  { id: 3, name: 'Emily Davis', email: 'emily.d@email.com', attending: 'no', guests: 0, meal: '', signInterpreter: false, submittedAt: '2026-06-13', message: 'Will be thinking of you!' },
-  { id: 4, name: 'James Wilson', email: 'jwilson@email.com', attending: 'yes', guests: 3, meal: 'Fish', signInterpreter: false, submittedAt: '2026-06-12', message: 'Congratulations!' },
-  { id: 5, name: 'Amanda Roberts', email: 'aroberts@email.com', attending: 'yes', guests: 2, meal: 'Chicken', signInterpreter: true, submittedAt: '2026-06-11', message: '' },
-  { id: 6, name: 'David Kim', email: 'dkim@email.com', attending: 'pending', guests: 0, meal: '', signInterpreter: false, submittedAt: '', message: '' },
-  { id: 7, name: 'Rachel Martinez', email: 'rmartinez@email.com', attending: 'yes', guests: 1, meal: 'Vegetarian', signInterpreter: false, submittedAt: '2026-06-10', message: 'Can\'t wait!' },
-  { id: 8, name: 'Thomas Brown', email: 'tbrown@email.com', attending: 'no', guests: 0, meal: '', signInterpreter: false, submittedAt: '2026-06-09', message: 'Sorry to miss it' },
-]
+interface RSVP {
+  id: number
+  name: string
+  phone: string
+  attending: boolean
+  guestCount: number
+  message: string
+  createdAt: string
+}
 
-type FilterType = 'all' | 'attending' | 'declined' | 'pending'
+type SortField = 'name' | 'phone' | 'attending' | 'guestCount' | 'createdAt'
+type SortDirection = 'asc' | 'desc'
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [password, setPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
+  
+  const [rsvps, setRsvps] = useState<RSVP[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  
   const [searchTerm, setSearchTerm] = useState('')
-  const [filter, setFilter] = useState<FilterType>('all')
+  const [sortField, setSortField] = useState<SortField>('createdAt')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
-  // Calculate stats
-  const stats = {
-    total: mockRSVPs.length,
-    attending: mockRSVPs.filter(r => r.attending === 'yes').length,
-    declined: mockRSVPs.filter(r => r.attending === 'no').length,
-    pending: mockRSVPs.filter(r => r.attending === 'pending').length,
-    totalGuests: mockRSVPs.filter(r => r.attending === 'yes').reduce((sum, r) => sum + r.guests, 0),
-    needInterpreter: mockRSVPs.filter(r => r.signInterpreter).length,
-    mealCounts: {
-      chicken: mockRSVPs.filter(r => r.meal === 'Chicken').length,
-      fish: mockRSVPs.filter(r => r.meal === 'Fish').length,
-      vegetarian: mockRSVPs.filter(r => r.meal === 'Vegetarian').length,
+  // Check localStorage for auth on mount
+  useEffect(() => {
+    const authKey = localStorage.getItem('admin_auth')
+    if (authKey === 'authenticated') {
+      setIsAuthenticated(true)
+    }
+    setIsCheckingAuth(false)
+  }, [])
+
+  // Fetch RSVPs when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchRSVPs()
+    }
+  }, [isAuthenticated])
+
+  const fetchRSVPs = async () => {
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_NOCODB_URL || 'http://localhost:8080'
+      const token = process.env.NEXT_PUBLIC_NOCODB_TOKEN || ''
+      
+      const response = await fetch(`${baseUrl}/api/v1/db/data/noco/rsvp`, {
+        headers: {
+          'xc-token': token,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch RSVPs')
+      }
+      
+      const data = await response.json()
+      // NocoDB returns data in a 'list' array
+      const rsvpList = data.list || data || []
+      setRsvps(rsvpList.map((item: Record<string, unknown>, index: number) => ({
+        id: item.Id || item.id || index,
+        name: item.name || item.Name || '',
+        phone: item.phone || item.Phone || '',
+        attending: item.attending === true || item.attending === 'true' || item.Attending === true,
+        guestCount: Number(item.guestCount || item.GuestCount || item.guest_count || 0),
+        message: item.message || item.Message || '',
+        createdAt: item.createdAt || item.CreatedAt || item.created_at || new Date().toISOString()
+      })))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load RSVPs')
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  // Filter RSVPs
-  const filteredRSVPs = mockRSVPs.filter(rsvp => {
-    const matchesSearch = rsvp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         rsvp.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesFilter = filter === 'all' || 
-                         (filter === 'attending' && rsvp.attending === 'yes') ||
-                         (filter === 'declined' && rsvp.attending === 'no') ||
-                         (filter === 'pending' && rsvp.attending === 'pending')
-    return matchesSearch && matchesFilter
-  })
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === 'manuanne2025') {
+      localStorage.setItem('admin_auth', 'authenticated')
+      setIsAuthenticated(true)
+      setPasswordError('')
+    } else {
+      setPasswordError('Incorrect password')
+    }
+  }
 
+  const handleLogout = () => {
+    localStorage.removeItem('admin_auth')
+    setIsAuthenticated(false)
+    setRsvps([])
+  }
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const attending = rsvps.filter(r => r.attending)
+    const notAttending = rsvps.filter(r => !r.attending)
+    const totalGuests = attending.reduce((sum, r) => sum + (r.guestCount || 1), 0)
+    
+    return {
+      total: rsvps.length,
+      attending: attending.length,
+      notAttending: notAttending.length,
+      totalGuests
+    }
+  }, [rsvps])
+
+  // Filter and sort RSVPs
+  const filteredAndSortedRsvps = useMemo(() => {
+    let filtered = rsvps.filter(rsvp => 
+      rsvp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rsvp.phone.includes(searchTerm) ||
+      rsvp.message.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+
+    filtered.sort((a, b) => {
+      let aVal: string | number | boolean = a[sortField]
+      let bVal: string | number | boolean = b[sortField]
+      
+      if (typeof aVal === 'string') aVal = aVal.toLowerCase()
+      if (typeof bVal === 'string') bVal = bVal.toLowerCase()
+      
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+
+    return filtered
+  }, [rsvps, searchTerm, sortField, sortDirection])
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return null
+    return sortDirection === 'asc' 
+      ? <ChevronUp className="w-4 h-4 inline ml-1" />
+      : <ChevronDown className="w-4 h-4 inline ml-1" />
+  }
+
+  // Chart calculations
+  const chartData = useMemo(() => {
+    const total = stats.attending + stats.notAttending
+    if (total === 0) return { attendingPercent: 0, notAttendingPercent: 0 }
+    return {
+      attendingPercent: Math.round((stats.attending / total) * 100),
+      notAttendingPercent: Math.round((stats.notAttending / total) * 100)
+    }
+  }, [stats])
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-terracotta animate-spin" />
+      </div>
+    )
+  }
+
+  // Password gate screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-warm-white rounded-xl shadow-xl p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-terracotta/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-8 h-8 text-terracotta" />
+              </div>
+              <h1 className="font-serif text-2xl text-brown mb-2">Admin Access</h1>
+              <p className="text-muted-foreground text-sm">
+                Enter the password to view RSVPs
+              </p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setPasswordError('')
+                  }}
+                  placeholder="Enter password"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 text-brown placeholder:text-muted-foreground"
+                />
+                <AnimatePresence>
+                  {passwordError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="text-destructive text-sm mt-2 flex items-center gap-1"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {passwordError}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-3 bg-terracotta text-warm-white rounded-lg font-medium hover:bg-terracotta/90 transition-colors"
+              >
+                Access Dashboard
+              </motion.button>
+            </form>
+
+            <p className="text-center text-xs text-muted-foreground mt-6 italic">
+              &ldquo;Faithful in little, faithful in much&rdquo;
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
+
+  // Dashboard
   return (
     <div className="min-h-screen bg-cream py-8 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
@@ -67,195 +259,298 @@ export default function AdminPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
         >
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3">
             <HandSignIcon className="w-8 h-8 text-terracotta" />
-            <h1 className="font-serif text-3xl md:text-4xl text-brown">Admin Dashboard</h1>
+            <div>
+              <h1 className="font-serif text-3xl md:text-4xl text-brown">Admin Dashboard</h1>
+              <p className="text-muted-foreground text-sm">Manu & Anne&apos;s Wedding RSVPs</p>
+            </div>
           </div>
-          <p className="text-muted-foreground">Manage RSVPs for Manu & Anne&apos;s Wedding</p>
+          <button
+            onClick={handleLogout}
+            className="self-start sm:self-auto px-4 py-2 text-sm text-muted-foreground hover:text-brown border border-border rounded-lg hover:bg-cream transition-colors"
+          >
+            Log out
+          </button>
         </motion.div>
+
+        {/* Error State */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="bg-destructive/10 border border-destructive/20 text-destructive rounded-lg p-4 mb-6 flex items-center gap-3"
+            >
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p>{error}</p>
+              <button 
+                onClick={fetchRSVPs}
+                className="ml-auto text-sm underline hover:no-underline"
+              >
+                Retry
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
           <StatCard 
             icon={<Users className="w-5 h-5" />}
-            label="Total Invited"
+            label="Total RSVPs"
             value={stats.total}
             color="brown"
+            delay={0}
           />
           <StatCard 
             icon={<CheckCircle className="w-5 h-5" />}
             label="Attending"
             value={stats.attending}
             color="sage"
+            delay={0.1}
           />
           <StatCard 
             icon={<XCircle className="w-5 h-5" />}
-            label="Declined"
-            value={stats.declined}
+            label="Not Attending"
+            value={stats.notAttending}
             color="terracotta"
+            delay={0.2}
           />
           <StatCard 
-            icon={<Clock className="w-5 h-5" />}
-            label="Pending"
-            value={stats.pending}
-            color="muted"
-          />
-          <StatCard 
-            icon={<Users className="w-5 h-5" />}
+            icon={<UserPlus className="w-5 h-5" />}
             label="Total Guests"
             value={stats.totalGuests}
             color="sage"
-          />
-          <StatCard 
-            icon={<HandMetal className="w-5 h-5" />}
-            label="Need Interpreter"
-            value={stats.needInterpreter}
-            color="terracotta"
+            delay={0.3}
           />
         </motion.div>
 
-        {/* Meal Breakdown */}
+        {/* Chart Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-warm-white rounded-lg shadow-lg p-4 md:p-6 mb-8"
+          className="bg-warm-white rounded-xl shadow-lg p-6 mb-8"
         >
-          <div className="flex items-center gap-2 mb-4">
-            <Utensils className="w-5 h-5 text-terracotta" />
-            <h2 className="font-serif text-xl text-brown">Meal Preferences</h2>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-cream rounded-md">
-              <p className="text-2xl font-serif text-terracotta">{stats.mealCounts.chicken}</p>
-              <p className="text-sm text-muted-foreground">Chicken</p>
+          <h2 className="font-serif text-xl text-brown mb-6">Attendance Overview</h2>
+          
+          {stats.total === 0 ? (
+            <p className="text-muted-foreground text-center py-8">No RSVPs yet</p>
+          ) : (
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Pie Chart */}
+              <div className="relative w-48 h-48">
+                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                  {/* Background circle */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="var(--border)"
+                    strokeWidth="20"
+                  />
+                  {/* Attending segment */}
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="none"
+                    stroke="var(--sage)"
+                    strokeWidth="20"
+                    strokeDasharray={`${chartData.attendingPercent * 2.51} 251`}
+                    initial={{ strokeDasharray: "0 251" }}
+                    animate={{ strokeDasharray: `${chartData.attendingPercent * 2.51} 251` }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <p className="text-3xl font-serif text-brown">{chartData.attendingPercent}%</p>
+                    <p className="text-xs text-muted-foreground">Attending</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded bg-sage" />
+                  <span className="text-brown">Attending</span>
+                  <span className="text-muted-foreground">({stats.attending})</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded bg-terracotta" />
+                  <span className="text-brown">Not Attending</span>
+                  <span className="text-muted-foreground">({stats.notAttending})</span>
+                </div>
+              </div>
+
+              {/* Bar representation */}
+              <div className="flex-1 w-full md:w-auto">
+                <div className="space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-brown">Attending</span>
+                      <span className="text-muted-foreground">{chartData.attendingPercent}%</span>
+                    </div>
+                    <div className="h-3 bg-border rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-sage rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${chartData.attendingPercent}%` }}
+                        transition={{ duration: 1, delay: 0.5 }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-brown">Not Attending</span>
+                      <span className="text-muted-foreground">{chartData.notAttendingPercent}%</span>
+                    </div>
+                    <div className="h-3 bg-border rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-terracotta rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${chartData.notAttendingPercent}%` }}
+                        transition={{ duration: 1, delay: 0.6 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-center p-3 bg-cream rounded-md">
-              <p className="text-2xl font-serif text-sage">{stats.mealCounts.fish}</p>
-              <p className="text-sm text-muted-foreground">Fish</p>
-            </div>
-            <div className="text-center p-3 bg-cream rounded-md">
-              <p className="text-2xl font-serif text-brown">{stats.mealCounts.vegetarian}</p>
-              <p className="text-sm text-muted-foreground">Vegetarian</p>
-            </div>
-          </div>
+          )}
         </motion.div>
 
-        {/* RSVP List */}
+        {/* RSVP Table */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-warm-white rounded-lg shadow-lg overflow-hidden"
+          className="bg-warm-white rounded-xl shadow-lg overflow-hidden"
         >
-          {/* List Header */}
+          {/* Table Header */}
           <div className="p-4 md:p-6 border-b border-border">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <h2 className="font-serif text-xl text-brown">RSVP Responses</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="font-serif text-xl text-brown">All RSVPs</h2>
               
-              <div className="flex flex-col sm:flex-row gap-3">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search by name or email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 pr-4 py-2 border border-border rounded-md bg-cream/50 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-terracotta/50"
-                  />
-                </div>
-
-                {/* Filter */}
-                <div className="relative">
-                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value as FilterType)}
-                    className="pl-9 pr-8 py-2 border border-border rounded-md bg-cream/50 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-terracotta/50"
-                  >
-                    <option value="all">All Responses</option>
-                    <option value="attending">Attending</option>
-                    <option value="declined">Declined</option>
-                    <option value="pending">Pending</option>
-                  </select>
-                </div>
-
-                {/* Export */}
-                <button className="flex items-center justify-center gap-2 px-4 py-2 bg-sage text-warm-white rounded-md hover:bg-sage/90 transition-colors">
-                  <Download className="w-4 h-4" />
-                  <span>Export</span>
-                </button>
+              {/* Search */}
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by name, phone, or message..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 text-sm"
+                />
               </div>
             </div>
           </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-cream/50 text-sm text-muted-foreground">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium">Guest</th>
-                  <th className="text-left px-4 py-3 font-medium">Status</th>
-                  <th className="text-left px-4 py-3 font-medium">Guests</th>
-                  <th className="text-left px-4 py-3 font-medium">Meal</th>
-                  <th className="text-left px-4 py-3 font-medium">Interpreter</th>
-                  <th className="text-left px-4 py-3 font-medium">Date</th>
-                  <th className="text-left px-4 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filteredRSVPs.map((rsvp) => (
-                  <tr key={rsvp.id} className="hover:bg-cream/30 transition-colors">
-                    <td className="px-4 py-4">
-                      <div>
-                        <p className="font-medium text-brown">{rsvp.name}</p>
-                        <p className="text-sm text-muted-foreground">{rsvp.email}</p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <StatusBadge status={rsvp.attending} />
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      {rsvp.attending === 'yes' ? rsvp.guests : '-'}
-                    </td>
-                    <td className="px-4 py-4">
-                      {rsvp.meal || '-'}
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      {rsvp.signInterpreter ? (
-                        <HandSignIcon className="w-5 h-5 text-sage inline-block" />
-                      ) : '-'}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-muted-foreground">
-                      {rsvp.submittedAt || 'Not submitted'}
-                    </td>
-                    <td className="px-4 py-4">
-                      <button className="p-2 hover:bg-cream rounded-md transition-colors" title="Send email">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Loading State */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 text-terracotta animate-spin" />
+            </div>
+          ) : (
+            <>
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-cream/50 text-sm text-muted-foreground">
+                    <tr>
+                      <th 
+                        className="text-left px-4 py-3 font-medium cursor-pointer hover:text-brown transition-colors"
+                        onClick={() => handleSort('name')}
+                      >
+                        Name <SortIcon field="name" />
+                      </th>
+                      <th 
+                        className="text-left px-4 py-3 font-medium cursor-pointer hover:text-brown transition-colors"
+                        onClick={() => handleSort('phone')}
+                      >
+                        Phone <SortIcon field="phone" />
+                      </th>
+                      <th 
+                        className="text-left px-4 py-3 font-medium cursor-pointer hover:text-brown transition-colors"
+                        onClick={() => handleSort('attending')}
+                      >
+                        Attending <SortIcon field="attending" />
+                      </th>
+                      <th 
+                        className="text-left px-4 py-3 font-medium cursor-pointer hover:text-brown transition-colors"
+                        onClick={() => handleSort('guestCount')}
+                      >
+                        Guests <SortIcon field="guestCount" />
+                      </th>
+                      <th className="text-left px-4 py-3 font-medium">Message</th>
+                      <th 
+                        className="text-left px-4 py-3 font-medium cursor-pointer hover:text-brown transition-colors"
+                        onClick={() => handleSort('createdAt')}
+                      >
+                        Date <SortIcon field="createdAt" />
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredAndSortedRsvps.map((rsvp) => (
+                      <motion.tr 
+                        key={rsvp.id} 
+                        className="hover:bg-cream/30 transition-colors"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <td className="px-4 py-4">
+                          <p className="font-medium text-brown">{rsvp.name}</p>
+                        </td>
+                        <td className="px-4 py-4 text-muted-foreground">
+                          {rsvp.phone || '-'}
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            rsvp.attending 
+                              ? 'bg-sage/20 text-sage' 
+                              : 'bg-terracotta/20 text-terracotta'
+                          }`}>
+                            {rsvp.attending ? 'Yes' : 'No'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-center text-brown">
+                          {rsvp.attending ? rsvp.guestCount : '-'}
+                        </td>
+                        <td className="px-4 py-4 text-muted-foreground max-w-xs truncate">
+                          {rsvp.message || '-'}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-muted-foreground">
+                          {new Date(rsvp.createdAt).toLocaleDateString()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
 
-            {filteredRSVPs.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                No RSVPs match your search criteria
+                {filteredAndSortedRsvps.length === 0 && !isLoading && (
+                  <div className="text-center py-12 text-muted-foreground">
+                    {searchTerm ? 'No RSVPs match your search' : 'No RSVPs yet'}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </motion.div>
 
-        {/* Footer Note */}
+        {/* Footer */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -269,42 +564,31 @@ export default function AdminPage() {
   )
 }
 
-function StatCard({ icon, label, value, color }: { 
+function StatCard({ icon, label, value, color, delay }: { 
   icon: React.ReactNode
   label: string
   value: number
-  color: 'brown' | 'sage' | 'terracotta' | 'muted'
+  color: 'brown' | 'sage' | 'terracotta'
+  delay: number
 }) {
   const colorClasses = {
     brown: 'text-brown bg-brown/10',
     sage: 'text-sage bg-sage/10',
     terracotta: 'text-terracotta bg-terracotta/10',
-    muted: 'text-muted-foreground bg-muted',
   }
 
   return (
-    <div className="bg-warm-white rounded-lg shadow p-4">
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${colorClasses[color]}`}>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className="bg-warm-white rounded-xl shadow-lg p-5"
+    >
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 ${colorClasses[color]}`}>
         {icon}
       </div>
-      <p className="text-2xl font-serif text-brown">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
-  )
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const config = {
-    yes: { label: 'Attending', className: 'bg-sage/20 text-sage' },
-    no: { label: 'Declined', className: 'bg-terracotta/20 text-terracotta' },
-    pending: { label: 'Pending', className: 'bg-muted text-muted-foreground' },
-  }
-
-  const { label, className } = config[status as keyof typeof config] || config.pending
-
-  return (
-    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${className}`}>
-      {label}
-    </span>
+      <p className="text-3xl font-serif text-brown">{value}</p>
+      <p className="text-sm text-muted-foreground">{label}</p>
+    </motion.div>
   )
 }
