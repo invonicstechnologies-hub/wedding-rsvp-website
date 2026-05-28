@@ -27,7 +27,7 @@ export default function RSVPPage() {
     setErrorMessage('')
 
     try {
-      const response = await fetch('http://localhost:5678/webhook/rsvp', {
+      const response = await fetch('/api/rsvp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export default function RSVPPage() {
   }
 
   const itemVariants = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   }
 

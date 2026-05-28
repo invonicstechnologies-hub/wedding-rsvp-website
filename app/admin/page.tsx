@@ -66,23 +66,15 @@ export default function AdminPage() {
     setError('')
     
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_NOCODB_URL || 'http://localhost:8080'
-      const token = process.env.NEXT_PUBLIC_NOCODB_TOKEN || ''
-      
-      const response = await fetch(`${baseUrl}/api/v1/db/data/noco/rsvp`, {
-        headers: {
-          'xc-token': token,
-          'Content-Type': 'application/json'
-        }
-      })
+      const response = await fetch('/api/admin/guests')
       
       if (!response.ok) {
         throw new Error('Failed to fetch RSVPs')
       }
       
       const data = await response.json()
-      // NocoDB returns data in a 'list' array
-      const rsvpList = data.list || data || []
+      // Server route already extracts the .list array for us
+      const rsvpList = data.guests || []
       setRsvps(rsvpList.map((item: Record<string, unknown>, index: number) => ({
         id: item.Id || item.id || index,
         name: item.name || item.Name || '',
@@ -99,14 +91,25 @@ export default function AdminPage() {
     }
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === 'manuanne2025') {
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+
+      if (!res.ok) {
+        setPasswordError('Incorrect password')
+        return
+      }
+
       localStorage.setItem('admin_auth', 'authenticated')
       setIsAuthenticated(true)
       setPasswordError('')
-    } else {
-      setPasswordError('Incorrect password')
+    } catch {
+      setPasswordError('Authentication failed. Please try again.')
     }
   }
 

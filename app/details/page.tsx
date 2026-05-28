@@ -10,7 +10,7 @@ export default function DetailsPage() {
   const prefersReducedMotion = useReducedMotion()
 
   const fadeInUp = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    initial: { opacity: 0, y: 40 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, margin: '-50px' },
     transition: { duration: prefersReducedMotion ? 0 : 0.6, ease: 'easeOut' }
@@ -27,7 +27,7 @@ export default function DetailsPage() {
   }
 
   const staggerItem = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
     transition: { duration: prefersReducedMotion ? 0 : 0.5 }
   }

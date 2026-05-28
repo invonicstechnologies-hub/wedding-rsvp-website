@@ -146,13 +146,13 @@ export function HeroCouplePhoto() {
       }}
     >
       {/* Wreath container — sized to surround the photo */}
-      <div className="relative w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80">
+      <div className="relative w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80">
         {/* Animated floral wreath SVG */}
         <FloralWreath />
 
         {/* Double-border frame */}
-        <div className="absolute inset-[18px] md:inset-[20px] rounded-full overflow-hidden
-          ring-[3px] ring-cream ring-offset-[3px] ring-offset-terracotta/70
+        <div className="absolute inset-[14px] sm:inset-[18px] md:inset-[20px] rounded-full overflow-hidden
+          ring-2 sm:ring-[3px] ring-cream ring-offset-2 sm:ring-offset-[3px] ring-offset-terracotta/70
           shadow-xl shadow-brown/15"
         >
           {/* Sepia overlay */}
@@ -210,7 +210,7 @@ export function AboutCouplePhoto() {
         }}
       >
         {/* Photo area */}
-        <div className="relative w-56 h-64 md:w-72 md:h-80 overflow-hidden">
+        <div className="relative w-48 h-56 sm:w-56 sm:h-64 md:w-72 md:h-80 overflow-hidden">
           {/* Subtle warm overlay */}
           <div className="absolute inset-0 z-10 bg-[#d4a574] opacity-[0.06] pointer-events-none" />
           

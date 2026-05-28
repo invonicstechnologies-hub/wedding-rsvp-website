@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { Countdown } from '@/components/countdown'
 import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
 import { LeafDecoration } from '@/components/leaf-decoration'
-import { FallingPetals, CornerWreath, ScrollBloomDivider, FloatingScriptureVerses, MobileScriptureVerses } from '@/components/florals'
+import { FallingPetals, CornerWreath, FloatingScriptureVerses, MobileScriptureVerses } from '@/components/florals'
 import { HeroCouplePhoto, AboutCouplePhoto } from '@/components/couple-photo'
 
 export default function HomePage() {
   const prefersReducedMotion = useReducedMotion()
   
   const fadeInUp = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    hidden: { opacity: 0, y: 40 },
     visible: { opacity: 1, y: 0 }
   }
 
@@ -28,18 +28,22 @@ export default function HomePage() {
   }
   return (
     <div className="min-h-screen bg-cream">
-      {/* Falling Petals Animation */}
+      {/* Falling Petals — fewer on mobile for perf */}
       <FallingPetals count={24} />
       
-      {/* Hero Section - Full Screen */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Corner floral wreaths */}
-        <CornerWreath corner="top-left" size={100} className="z-20" />
-        <CornerWreath corner="bottom-right" size={100} className="z-20" />
+      {/* ===================== HERO SECTION ===================== */}
+      <section className="relative flex items-center justify-center overflow-hidden
+        min-h-[100dvh] py-20 md:py-0 md:min-h-screen">
         
-        {/* Decorative elements */}
-        <LeafDecoration className="absolute top-0 left-0 w-40 md:w-56 text-sage/30" position="left" />
-        <LeafDecoration className="absolute top-0 right-0 w-40 md:w-56 text-sage/30" position="right" />
+        {/* Corner wreaths — hidden on very small screens */}
+        <div className="hidden sm:block">
+          <CornerWreath corner="top-left" size={100} className="z-20" />
+          <CornerWreath corner="bottom-right" size={100} className="z-20" />
+        </div>
+        
+        {/* Leaf decorations — smaller on mobile, hidden on xs */}
+        <LeafDecoration className="absolute top-0 left-0 w-24 sm:w-40 md:w-56 text-sage/20 md:text-sage/30" position="left" />
+        <LeafDecoration className="absolute top-0 right-0 w-24 sm:w-40 md:w-56 text-sage/20 md:text-sage/30" position="right" />
         
         {/* Background texture */}
         <div className="absolute inset-0 opacity-5">
@@ -48,128 +52,209 @@ export default function HomePage() {
           }} />
         </div>
 
-        {/* Floating Scripture Verses — desktop only, positioned absolute */}
+        {/* Floating Scripture Verses — desktop only */}
         <FloatingScriptureVerses />
 
         <motion.div 
-          className="relative z-10 text-center px-6 max-w-5xl mx-auto"
+          className="relative z-10 text-center px-4 sm:px-6 w-full max-w-5xl mx-auto"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
-          {/* Couple Photo — mobile: above names */}
-          <motion.div
-            variants={fadeInUp}
-            transition={{ duration: 1 }}
-            className="flex md:hidden justify-center mb-8"
-          >
-            <HeroCouplePhoto />
-          </motion.div>
-
-          {/* Tagline */}
-          <motion.p
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-            className="text-sage text-sm md:text-base tracking-widest uppercase mb-8"
-          >
-            A love story written by God
-          </motion.p>
-
-          {/* Mobile scripture verses — stacked below tagline */}
-          <MobileScriptureVerses />
-
-          {/* Desktop: Photo + Names side by side */}
-          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 lg:gap-16">
-            {/* Photo — desktop only (left side) */}
+          {/* === MOBILE LAYOUT: stacked vertically === */}
+          <div className="md:hidden flex flex-col items-center">
+            {/* Photo — smaller on mobile */}
             <motion.div
               variants={fadeInUp}
               transition={{ duration: 1 }}
-              className="hidden md:block"
+              className="mb-4"
             >
               <HeroCouplePhoto />
             </motion.div>
 
-            {/* Names with decorative elements */}
-            <motion.div variants={fadeInUp} transition={{ duration: 1 }}>
-              <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
-                <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
-                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
+            {/* Tagline */}
+            <motion.p
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-sage text-xs sm:text-sm tracking-widest uppercase mb-3"
+            >
+              A love story written by God
+            </motion.p>
+
+            {/* Mobile scripture verses */}
+            <MobileScriptureVerses />
+
+            {/* Names — smaller on mobile */}
+            <motion.div variants={fadeInUp} transition={{ duration: 1 }} className="mt-4">
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
+                <HeartHandsIcon className="w-6 h-6 text-terracotta/60" />
+                <h1 className="font-serif text-5xl sm:text-6xl text-brown tracking-wide">
                   Manu
                 </h1>
               </div>
               
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="flex items-center justify-center gap-4 my-4"
-              >
-                <div className="h-px w-20 md:w-32 bg-terracotta/40" />
-                <span className="font-serif text-2xl md:text-3xl text-terracotta">&amp;</span>
-                <div className="h-px w-20 md:w-32 bg-terracotta/40" />
-              </motion.div>
+              <div className="flex items-center justify-center gap-3 my-2">
+                <div className="h-px w-14 sm:w-20 bg-terracotta/40" />
+                <span className="font-serif text-xl sm:text-2xl text-terracotta">&amp;</span>
+                <div className="h-px w-14 sm:w-20 bg-terracotta/40" />
+              </div>
 
-              <div className="flex items-center justify-center gap-4 md:gap-6 mt-2">
-                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
+              <div className="flex items-center justify-center gap-2 sm:gap-3">
+                <h1 className="font-serif text-5xl sm:text-6xl text-brown tracking-wide">
                   Anne
                 </h1>
-                <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
+                <HeartHandsIcon className="w-6 h-6 text-terracotta/60" />
               </div>
+            </motion.div>
+
+            {/* Last name */}
+            <motion.p
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-muted-foreground text-base mt-3 font-light tracking-widest uppercase"
+            >
+              James
+            </motion.p>
+
+            {/* Date */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-6"
+            >
+              <p className="font-serif text-xl sm:text-2xl text-terracotta">
+                September 21, 2026
+              </p>
+              <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+                Grace Community Church &bull; Nashville, TN
+              </p>
+            </motion.div>
+
+            {/* Countdown */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-8"
+            >
+              <Countdown targetDate="2026-09-21T14:00:00" />
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-8"
+            >
+              <Link
+                href="/rsvp"
+                className="inline-block px-8 py-3 bg-terracotta text-warm-white font-medium text-base rounded-md hover:bg-brown transition-colors shadow-lg shadow-terracotta/20"
+              >
+                RSVP Now
+              </Link>
             </motion.div>
           </div>
 
-          {/* Last name */}
-          <motion.p
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-            className="text-muted-foreground text-lg md:text-xl mt-6 font-light tracking-widest uppercase"
-          >
-            James
-          </motion.p>
-
-          {/* Date */}
-          <motion.div
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-            className="mt-12"
-          >
-            <p className="font-serif text-2xl md:text-4xl text-terracotta">
-              September 21, 2026
-            </p>
-            <p className="text-muted-foreground mt-3 text-base md:text-lg">
-              Grace Community Church &bull; Nashville, Tennessee
-            </p>
-          </motion.div>
-
-          {/* Countdown */}
-          <motion.div
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-            className="mt-16"
-          >
-            <Countdown targetDate="2026-09-21T14:00:00" />
-          </motion.div>
-
-          {/* CTA Button */}
-          <motion.div
-            variants={fadeInUp}
-            transition={{ duration: 0.8 }}
-            className="mt-14"
-          >
-            <Link
-              href="/rsvp"
-              className="inline-block px-10 py-4 bg-terracotta text-warm-white font-medium text-lg rounded-md hover:bg-brown transition-colors shadow-lg shadow-terracotta/20"
+          {/* === DESKTOP LAYOUT: photo + names side by side === */}
+          <div className="hidden md:block">
+            {/* Tagline */}
+            <motion.p
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-sage text-base tracking-widest uppercase mb-8"
             >
-              RSVP Now
-            </Link>
-          </motion.div>
+              A love story written by God
+            </motion.p>
+
+            {/* Photo + Names row */}
+            <div className="flex items-center justify-center gap-12 lg:gap-16">
+              <motion.div
+                variants={fadeInUp}
+                transition={{ duration: 1 }}
+              >
+                <HeroCouplePhoto />
+              </motion.div>
+
+              <motion.div variants={fadeInUp} transition={{ duration: 1 }}>
+                <div className="flex items-center justify-center gap-6 mb-2">
+                  <HeartHandsIcon className="w-12 h-12 text-terracotta/60" />
+                  <h1 className="font-serif text-8xl lg:text-9xl text-brown tracking-wide">
+                    Manu
+                  </h1>
+                </div>
+                
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                  className="flex items-center justify-center gap-4 my-4"
+                >
+                  <div className="h-px w-32 bg-terracotta/40" />
+                  <span className="font-serif text-3xl text-terracotta">&amp;</span>
+                  <div className="h-px w-32 bg-terracotta/40" />
+                </motion.div>
+
+                <div className="flex items-center justify-center gap-6 mt-2">
+                  <h1 className="font-serif text-8xl lg:text-9xl text-brown tracking-wide">
+                    Anne
+                  </h1>
+                  <HeartHandsIcon className="w-12 h-12 text-terracotta/60" />
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Last name */}
+            <motion.p
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="text-muted-foreground text-xl mt-6 font-light tracking-widest uppercase"
+            >
+              James
+            </motion.p>
+
+            {/* Date */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-12"
+            >
+              <p className="font-serif text-4xl text-terracotta">
+                September 21, 2026
+              </p>
+              <p className="text-muted-foreground mt-3 text-lg">
+                Grace Community Church &bull; Nashville, Tennessee
+              </p>
+            </motion.div>
+
+            {/* Countdown */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-16"
+            >
+              <Countdown targetDate="2026-09-21T14:00:00" />
+            </motion.div>
+
+            {/* CTA */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="mt-14"
+            >
+              <Link
+                href="/rsvp"
+                className="inline-block px-10 py-4 bg-terracotta text-warm-white font-medium text-lg rounded-md hover:bg-brown transition-colors shadow-lg shadow-terracotta/20"
+              >
+                RSVP Now
+              </Link>
+            </motion.div>
+          </div>
 
           {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 2, duration: 1 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
+            className="hidden sm:block absolute bottom-8 left-1/2 -translate-x-1/2"
           >
             <motion.div
               animate={{ y: [0, 8, 0] }}
@@ -183,42 +268,42 @@ export default function HomePage() {
           </motion.div>
         </motion.div>
 
-        {/* Bottom decorative leaves */}
-        <LeafDecoration className="absolute bottom-0 left-0 w-48 md:w-72 text-sage/20" position="bottom-left" />
-        <LeafDecoration className="absolute bottom-0 right-0 w-48 md:w-72 text-sage/20" position="bottom-right" />
+        {/* Bottom leaves — smaller on mobile */}
+        <LeafDecoration className="absolute bottom-0 left-0 w-28 sm:w-48 md:w-72 text-sage/15 md:text-sage/20" position="bottom-left" />
+        <LeafDecoration className="absolute bottom-0 right-0 w-28 sm:w-48 md:w-72 text-sage/15 md:text-sage/20" position="bottom-right" />
       </section>
 
-      {/* Our Story Section */}
-      <section className="py-24 md:py-32 bg-warm-white">
-        <div className="max-w-4xl mx-auto px-6">
+      {/* ===================== OUR STORY ===================== */}
+      <section className="py-16 md:py-32 bg-warm-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-80px" }}
             variants={staggerContainer}
             className="text-center"
           >
             {/* Section header */}
-            <motion.div variants={fadeInUp} transition={{ duration: 0.8 }} className="mb-12">
+            <motion.div variants={fadeInUp} transition={{ duration: 0.8 }} className="mb-8 md:mb-12">
               <div className="flex items-center justify-center gap-4 mb-4">
                 <div className="h-px w-12 bg-terracotta/40" />
                 <HandSignIcon className="w-8 h-8 text-terracotta/60" />
                 <div className="h-px w-12 bg-terracotta/40" />
               </div>
-              <h2 className="font-serif text-4xl md:text-5xl text-brown">Our Story</h2>
+              <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-brown">Our Story</h2>
             </motion.div>
 
             {/* About section couple photo */}
             <motion.div
               variants={fadeInUp}
               transition={{ duration: 0.8 }}
-              className="flex justify-center mb-12"
+              className="flex justify-center mb-8 md:mb-12"
             >
               <AboutCouplePhoto />
             </motion.div>
 
             {/* Story content */}
-            <div className="space-y-8 text-foreground/80 text-lg md:text-xl leading-relaxed">
+            <div className="space-y-6 md:space-y-8 text-foreground/80 text-base sm:text-lg md:text-xl leading-relaxed">
               <motion.p variants={fadeInUp} transition={{ duration: 0.8 }}>
                 It began in a Bible study group, where two hearts found common ground in faith 
                 and a shared calling to serve.
@@ -233,14 +318,14 @@ export default function HomePage() {
               <motion.div 
                 variants={fadeInUp} 
                 transition={{ duration: 0.8 }}
-                className="py-6"
+                className="py-4 md:py-6"
               >
-                <div className="flex items-center justify-center gap-3">
-                  <HandSignIcon className="w-6 h-6 text-terracotta" />
-                  <span className="text-terracotta font-serif text-xl italic">
+                <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <HandSignIcon className="w-5 h-5 sm:w-6 sm:h-6 text-terracotta flex-shrink-0" />
+                  <span className="text-terracotta font-serif text-base sm:text-xl italic">
                     He proposed via email — in Sign Language
                   </span>
-                  <HandSignIcon className="w-6 h-6 text-terracotta" />
+                  <HandSignIcon className="w-5 h-5 sm:w-6 sm:h-6 text-terracotta flex-shrink-0" />
                 </div>
               </motion.div>
 
@@ -254,7 +339,7 @@ export default function HomePage() {
             <motion.div 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="mt-12 flex items-center justify-center gap-3"
+              className="mt-8 md:mt-12 flex items-center justify-center gap-3"
             >
               <div className="h-px w-16 bg-sage/40" />
               <HeartHandsIcon className="w-6 h-6 text-sage/60" />
@@ -264,23 +349,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Scripture Quote Section */}
-      <section className="py-20 md:py-28 bg-sage/10">
-        <div className="max-w-3xl mx-auto px-6 text-center">
+      {/* ===================== SCRIPTURE QUOTE ===================== */}
+      <section className="py-14 md:py-28 bg-sage/10">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-80px" }}
             variants={staggerContainer}
           >
             <motion.div variants={fadeInUp} transition={{ duration: 0.8 }}>
-              <HandSignIcon className="w-12 h-12 mx-auto text-terracotta/50 mb-8" />
+              <HandSignIcon className="w-10 h-10 md:w-12 md:h-12 mx-auto text-terracotta/50 mb-6 md:mb-8" />
             </motion.div>
             
             <motion.blockquote 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="font-serif text-2xl md:text-3xl lg:text-4xl text-brown leading-relaxed italic"
+              className="font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl text-brown leading-relaxed italic"
             >
               &ldquo;Two are better than one, because they have a good return for their labor: 
               If either of them falls down, one can help the other up.&rdquo;
@@ -289,7 +374,7 @@ export default function HomePage() {
             <motion.cite 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="block mt-8 text-muted-foreground not-italic text-lg"
+              className="block mt-6 md:mt-8 text-muted-foreground not-italic text-base md:text-lg"
             >
               — Ecclesiastes 4:9-10
             </motion.cite>
@@ -297,19 +382,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 md:py-28 bg-cream">
-        <div className="max-w-2xl mx-auto px-6 text-center">
+      {/* ===================== CTA ===================== */}
+      <section className="py-14 md:py-28 bg-cream">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, margin: "-80px" }}
             variants={staggerContainer}
           >
             <motion.h3 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="font-serif text-3xl md:text-4xl text-brown mb-6"
+              className="font-serif text-2xl sm:text-3xl md:text-4xl text-brown mb-4 md:mb-6"
             >
               Join Us in Celebration
             </motion.h3>
@@ -317,7 +402,7 @@ export default function HomePage() {
             <motion.p 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="text-muted-foreground text-lg mb-10 leading-relaxed"
+              className="text-muted-foreground text-base md:text-lg mb-8 md:mb-10 leading-relaxed"
             >
               We would be honored to have you witness the beginning of our new chapter. 
               Please let us know if you can attend.
@@ -326,17 +411,17 @@ export default function HomePage() {
             <motion.div 
               variants={fadeInUp} 
               transition={{ duration: 0.8 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
             >
               <Link
                 href="/rsvp"
-                className="px-8 py-3 bg-terracotta text-warm-white font-medium rounded-md hover:bg-brown transition-colors shadow-lg shadow-terracotta/20"
+                className="w-full sm:w-auto px-8 py-3 bg-terracotta text-warm-white font-medium rounded-md hover:bg-brown transition-colors shadow-lg shadow-terracotta/20 text-center"
               >
                 RSVP Now
               </Link>
               <Link
                 href="/details"
-                className="px-8 py-3 border-2 border-sage text-sage font-medium rounded-md hover:bg-sage hover:text-warm-white transition-colors"
+                className="w-full sm:w-auto px-8 py-3 border-2 border-sage text-sage font-medium rounded-md hover:bg-sage hover:text-warm-white transition-colors text-center"
               >
                 View Details
               </Link>
