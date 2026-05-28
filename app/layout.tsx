@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description: 'Join us in celebrating the union of Manuscripts and Anne James. Two hearts, one love, speaking in words and signs.',
   openGraph: {
     title: 'Manu & Anne | Wedding Celebration',
-    description: 'A love story written by God — September 21, 2026',
+    description: 'A love story written by God — September 5, 2026',
     type: 'website',
     images: [
       {
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Manu & Anne | Wedding Celebration',
-    description: 'A love story written by God — September 21, 2026',
+    description: 'A love story written by God — September 5, 2026',
     images: ['/images/couple.jpg'],
   },
   icons: {

@@ -96,7 +96,7 @@ export default function DetailsPage() {
               <div className="flex items-start gap-4">
                 <Calendar className="w-5 h-5 text-sage mt-1 shrink-0" />
                 <div>
-                  <p className="font-medium text-brown">Saturday, September 21, 2026</p>
+                  <p className="font-medium text-brown">Saturday, September 5, 2026</p>
                   <p className="text-sm text-brown/60">Save the date!</p>
                 </div>
               </div>

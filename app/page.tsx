@@ -144,7 +144,7 @@ export default function HomePage() {
               className="mt-6"
             >
               <p className="font-serif text-xl sm:text-2xl text-terracotta">
-                September 21, 2026
+                September 5, 2026
               </p>
               <p className="text-muted-foreground mt-2 text-sm sm:text-base">
                 Grace Community Church &bull; Nashville, TN
@@ -157,7 +157,7 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="mt-8"
             >
-              <Countdown targetDate="2026-09-21T14:00:00" />
+              <Countdown targetDate="2026-09-05T14:00:00" />
             </motion.div>
 
             {/* CTA */}
@@ -239,7 +239,7 @@ export default function HomePage() {
               className="mt-12"
             >
               <p className="font-serif text-4xl text-terracotta">
-                September 21, 2026
+                September 5, 2026
               </p>
               <p className="text-muted-foreground mt-3 text-lg">
                 Grace Community Church &bull; Nashville, Tennessee
@@ -252,7 +252,7 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="mt-16"
             >
-              <Countdown targetDate="2026-09-21T14:00:00" />
+              <Countdown targetDate="2026-09-05T14:00:00" />
             </motion.div>
 
             {/* CTA */}
