@@ -10,7 +10,7 @@ export default function DetailsPage() {
   const prefersReducedMotion = useReducedMotion()
 
   const fadeInUp = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 40 },
+    initial: { opacity: 0, y: 40 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, margin: '-50px' },
     transition: { duration: prefersReducedMotion ? 0 : 0.6, ease: 'easeOut' }
@@ -27,7 +27,7 @@ export default function DetailsPage() {
   }
 
   const staggerItem = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+    initial: { opacity: 0, y: 20 },
     whileInView: { opacity: 1, y: 0 },
     transition: { duration: prefersReducedMotion ? 0 : 0.5 }
   }
@@ -96,7 +96,7 @@ export default function DetailsPage() {
               <div className="flex items-start gap-4">
                 <Calendar className="w-5 h-5 text-sage mt-1 shrink-0" />
                 <div>
-                  <p className="font-medium text-brown">Saturday, September 21, 2026</p>
+                  <p className="font-medium text-brown">Saturday, September 5, 2026</p>
                   <p className="text-sm text-brown/60">Save the date!</p>
                 </div>
               </div>

@@ -8,7 +8,7 @@ export function Footer() {
   
   return (
     <motion.footer 
-      initial={{ opacity: prefersReducedMotion ? 1 : 0 }}
+      initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: prefersReducedMotion ? 0 : 0.5 }}
       className="py-10 bg-brown text-warm-white/80"

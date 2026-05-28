@@ -23,12 +23,12 @@ export function Navigation() {
 
   return (
     <motion.nav 
-      initial={prefersReducedMotion ? { y: 0 } : { y: -100 }}
+      initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.6, ease: 'easeOut' }}
       className="fixed top-0 left-0 right-0 z-50 bg-warm-white/90 backdrop-blur-sm border-b border-border"
     >
-      <div className="max-w-6xl mx-auto px-6 py-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo/Names with subtle hand motif */}
           <Link href="/" className="flex items-center gap-2 group">

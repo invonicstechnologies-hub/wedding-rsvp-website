@@ -56,7 +56,7 @@ export function Countdown({ targetDate }: CountdownProps) {
       {timeUnits.map((unit, index) => (
         <motion.div
           key={unit.label}
-          initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: prefersReducedMotion ? 0 : index * 0.1 }}
           className="text-center"
