@@ -16,7 +16,7 @@ export default function RSVPPage() {
     phone: '',
     message: '',
     attending: true,
-    guestCount: 1,
+    companyCount: '',
   })
   const [formState, setFormState] = useState<FormState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
@@ -37,7 +37,7 @@ export default function RSVPPage() {
           phone: formData.phone,
           message: formData.message,
           attending: formData.attending,
-          guestCount: formData.attending ? formData.guestCount : 0,
+          guestCount: formData.attending ? 1 + (parseInt(formData.companyCount) || 0) : 0,
         }),
       })
 
@@ -215,7 +215,7 @@ export default function RSVPPage() {
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200"
-              placeholder="(555) 123-4567"
+              placeholder="254700000000"
             />
           </motion.div>
 
@@ -273,19 +273,20 @@ export default function RSVPPage() {
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <label htmlFor="guestCount" className="block text-sm font-medium text-brown mb-2">
-                  Number of Guests (including yourself)
+                <label htmlFor="companyCount" className="block text-sm font-medium text-brown mb-2">
+                  How many are you bringing for company?
                 </label>
                 <motion.input
                   variants={inputFocusVariants}
                   initial="rest"
                   whileFocus="focus"
                   type="number"
-                  id="guestCount"
-                  min={1}
-                  max={10}
-                  value={formData.guestCount}
-                  onChange={(e) => setFormData({ ...formData, guestCount: parseInt(e.target.value) || 1 })}
+                  id="companyCount"
+                  min={0}
+                  max={9}
+                  placeholder="0"
+                  value={formData.companyCount}
+                  onChange={(e) => setFormData({ ...formData, companyCount: e.target.value })}
                   className="w-full px-4 py-3 border border-border rounded-md bg-cream/50 focus:outline-none focus:ring-2 focus:ring-terracotta/50 focus:border-terracotta transition-all duration-200"
                 />
               </motion.div>
