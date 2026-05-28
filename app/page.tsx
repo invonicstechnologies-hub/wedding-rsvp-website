@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { Countdown } from '@/components/countdown'
 import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
 import { LeafDecoration } from '@/components/leaf-decoration'
-import { FallingPetals, CornerWreath, ScrollBloomDivider } from '@/components/florals'
+import { FallingPetals, CornerWreath, ScrollBloomDivider, FloatingScriptureVerses, MobileScriptureVerses } from '@/components/florals'
+import { HeroCouplePhoto, AboutCouplePhoto } from '@/components/couple-photo'
 
 export default function HomePage() {
   const prefersReducedMotion = useReducedMotion()
@@ -47,12 +48,24 @@ export default function HomePage() {
           }} />
         </div>
 
+        {/* Floating Scripture Verses — desktop only, positioned absolute */}
+        <FloatingScriptureVerses />
+
         <motion.div 
-          className="relative z-10 text-center px-6 max-w-4xl mx-auto"
+          className="relative z-10 text-center px-6 max-w-5xl mx-auto"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
+          {/* Couple Photo — mobile: above names */}
+          <motion.div
+            variants={fadeInUp}
+            transition={{ duration: 1 }}
+            className="flex md:hidden justify-center mb-8"
+          >
+            <HeroCouplePhoto />
+          </motion.div>
+
           {/* Tagline */}
           <motion.p
             variants={fadeInUp}
@@ -62,33 +75,48 @@ export default function HomePage() {
             A love story written by God
           </motion.p>
 
-          {/* Names with decorative elements */}
-          <motion.div variants={fadeInUp} transition={{ duration: 1 }}>
-            <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
-              <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
-              <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
-                Manu
-              </h1>
-            </div>
-            
+          {/* Mobile scripture verses — stacked below tagline */}
+          <MobileScriptureVerses />
+
+          {/* Desktop: Photo + Names side by side */}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 lg:gap-16">
+            {/* Photo — desktop only (left side) */}
             <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="flex items-center justify-center gap-4 my-4"
+              variants={fadeInUp}
+              transition={{ duration: 1 }}
+              className="hidden md:block"
             >
-              <div className="h-px w-20 md:w-32 bg-terracotta/40" />
-              <span className="font-serif text-2xl md:text-3xl text-terracotta">&amp;</span>
-              <div className="h-px w-20 md:w-32 bg-terracotta/40" />
+              <HeroCouplePhoto />
             </motion.div>
 
-            <div className="flex items-center justify-center gap-4 md:gap-6 mt-2">
-              <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
-                Anne
-              </h1>
-              <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
-            </div>
-          </motion.div>
+            {/* Names with decorative elements */}
+            <motion.div variants={fadeInUp} transition={{ duration: 1 }}>
+              <div className="flex items-center justify-center gap-4 md:gap-6 mb-2">
+                <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
+                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
+                  Manu
+                </h1>
+              </div>
+              
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="flex items-center justify-center gap-4 my-4"
+              >
+                <div className="h-px w-20 md:w-32 bg-terracotta/40" />
+                <span className="font-serif text-2xl md:text-3xl text-terracotta">&amp;</span>
+                <div className="h-px w-20 md:w-32 bg-terracotta/40" />
+              </motion.div>
+
+              <div className="flex items-center justify-center gap-4 md:gap-6 mt-2">
+                <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-brown tracking-wide">
+                  Anne
+                </h1>
+                <HeartHandsIcon className="w-8 h-8 md:w-12 md:h-12 text-terracotta/60" />
+              </div>
+            </motion.div>
+          </div>
 
           {/* Last name */}
           <motion.p
@@ -178,6 +206,15 @@ export default function HomePage() {
                 <div className="h-px w-12 bg-terracotta/40" />
               </div>
               <h2 className="font-serif text-4xl md:text-5xl text-brown">Our Story</h2>
+            </motion.div>
+
+            {/* About section couple photo */}
+            <motion.div
+              variants={fadeInUp}
+              transition={{ duration: 0.8 }}
+              className="flex justify-center mb-12"
+            >
+              <AboutCouplePhoto />
             </motion.div>
 
             {/* Story content */}
