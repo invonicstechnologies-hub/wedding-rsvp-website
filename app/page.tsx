@@ -1,15 +1,36 @@
 'use client'
 
-import { motion, useReducedMotion } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { Countdown } from '@/components/countdown'
 import { HandSignIcon, HeartHandsIcon } from '@/components/hand-sign-icon'
 import { LeafDecoration } from '@/components/leaf-decoration'
 import { FallingPetals, CornerWreath, FloatingScriptureVerses, MobileScriptureVerses } from '@/components/florals'
 import { HeroCouplePhoto, AboutCouplePhoto } from '@/components/couple-photo'
+import { HowItBegan } from '@/components/how-it-began'
 
 export default function HomePage() {
   const prefersReducedMotion = useReducedMotion()
+
+  // Guard scroll-based transforms until after hydration so SSR always
+  // renders the static (reduced-motion) fallback, avoiding mismatch.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const useScrollAnimations = mounted && !prefersReducedMotion
+
+  // 3D Scroll Effect refs and transforms
+  const storyRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: storyRef,
+    offset: ["start end", "end start"]
+  })
+  
+  // 3D Transforms mapped to scroll progress
+  const storyRotateX = useTransform(scrollYProgress, [0, 0.4, 0.6, 1], [35, 0, 0, -35])
+  const storyOpacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+  const storyScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.85, 1, 1, 0.85])
+  const storyY = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [100, 0, 0, -100])
   
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
@@ -273,15 +294,25 @@ export default function HomePage() {
         <LeafDecoration className="absolute bottom-0 right-0 w-28 sm:w-48 md:w-72 text-sage/15 md:text-sage/20" position="bottom-right" />
       </section>
 
+      {/* ===================== HOW IT BEGAN MONTAGE ===================== */}
+      <HowItBegan />
+
       {/* ===================== OUR STORY ===================== */}
-      <section className="py-16 md:py-32 bg-warm-white">
+      <section ref={storyRef} className="py-16 md:py-32 bg-warm-white overflow-hidden" style={{ perspective: '1200px' }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <motion.div
+            style={{
+              rotateX: useScrollAnimations ? storyRotateX : 0,
+              opacity: useScrollAnimations ? storyOpacity : 1,
+              scale: useScrollAnimations ? storyScale : 1,
+              y: useScrollAnimations ? storyY : 0,
+              transformStyle: "preserve-3d"
+            }}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={staggerContainer}
-            className="text-center"
+            className="text-center origin-center"
           >
             {/* Section header */}
             <motion.div variants={fadeInUp} transition={{ duration: 0.8 }} className="mb-8 md:mb-12">

@@ -12,9 +12,9 @@ function FloralWreath() {
   const leaves = Array.from({ length: 16 }, (_, i) => {
     const angle = (i / 16) * Math.PI * 2
     const r = 130
-    const cx = 150 + Math.cos(angle) * r
-    const cy = 150 + Math.sin(angle) * r
-    const rotation = (angle * 180) / Math.PI + 90
+    const cx = Math.round((150 + Math.cos(angle) * r) * 1e4) / 1e4
+    const cy = Math.round((150 + Math.sin(angle) * r) * 1e4) / 1e4
+    const rotation = Math.round(((angle * 180) / Math.PI + 90) * 1e4) / 1e4
     return { cx, cy, rotation, delay: i * 0.08 }
   })
 
@@ -77,8 +77,8 @@ function FloralWreath() {
       {/* Small flowers at cardinal points */}
       {[0, 90, 180, 270].map((angle, i) => {
         const rad = (angle * Math.PI) / 180
-        const cx = 150 + Math.cos(rad) * 130
-        const cy = 150 + Math.sin(rad) * 130
+        const cx = Math.round((150 + Math.cos(rad) * 130) * 1e4) / 1e4
+        const cy = Math.round((150 + Math.sin(rad) * 130) * 1e4) / 1e4
         return (
           <motion.g
             key={`flower-${i}`}
@@ -95,8 +95,8 @@ function FloralWreath() {
             {[0, 72, 144, 216, 288].map((pAngle) => (
               <ellipse
                 key={pAngle}
-                cx={Math.cos((pAngle * Math.PI) / 180) * 5}
-                cy={Math.sin((pAngle * Math.PI) / 180) * 5}
+                cx={Math.round(Math.cos((pAngle * Math.PI) / 180) * 5 * 1e4) / 1e4}
+                cy={Math.round(Math.sin((pAngle * Math.PI) / 180) * 5 * 1e4) / 1e4}
                 rx="3"
                 ry="4.5"
                 fill="#C1714F"
@@ -167,6 +167,7 @@ export function HeroCouplePhoto() {
               fill
               className="object-cover object-top"
               priority
+              loading="eager"
               onError={() => setImgError(true)}
               sizes="(max-width: 768px) 224px, (max-width: 1024px) 288px, 320px"
             />
